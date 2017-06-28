@@ -6,8 +6,8 @@ using namespace DirectX;
 
 namespace DX
 {
-	const float OrthographicCamera::DefaultViewWidth = 100.0f;
-	const float OrthographicCamera::DefaultViewHeight = 100.0f;
+	const float OrthographicCamera::DefaultViewWidth = 512.0f;
+	const float OrthographicCamera::DefaultViewHeight = 448.0f;
 
 	OrthographicCamera::OrthographicCamera(const shared_ptr<DX::DeviceResources>& deviceResourcese, float viewWidth, float viewHeight, float nearPlaneDistance, float farPlaneDistance) :
 		Camera(deviceResourcese, nearPlaneDistance, farPlaneDistance),
