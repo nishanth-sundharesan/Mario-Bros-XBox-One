@@ -124,7 +124,11 @@ namespace DX
 
 	void Camera::UpdateViewMatrix()
 	{
-		XMVECTOR eyePosition = XMLoadFloat3(&mPosition);
+		XMFLOAT3 position = mPosition;
+		position.x += OrthographicCamera::DefaultViewWidth / 2.0f;								//Making the orthographic X start from the left. i.e. x = 0 = left of the screen
+		position.y += OrthographicCamera::DefaultViewHeight/ 2.0f;								//Making the orthographic Y start from the bottom. i.e. y = 0 = bottom of the screen
+
+		XMVECTOR eyePosition = XMLoadFloat3(&position);
 		XMVECTOR direction = XMLoadFloat3(&mDirection);
 		XMVECTOR upDirection = XMLoadFloat3(&mUp);
 
