@@ -1,0 +1,9 @@
+Source/Game.Universal/obj/
+Source/Library.Windows/obj/
+Source/Library.Windows/bin/
+Source/Game.Universal/bin/
+Build/.vs/
+Build/packages/
+Build/DirectX.Framework.VC.db
+Build/ipch/
+Build/DirectX.Framework.VC.VC.opendb
