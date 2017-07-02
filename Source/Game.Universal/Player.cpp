@@ -11,59 +11,56 @@ using namespace Animation;
 namespace GameEntity
 {
 	/******************* Player Constants ******************************/
-	const int32_t Player::sPLAYER_1_INITIAL_POS_X = 135;
-	const int32_t Player::sPLAYER_1_INITIAL_POS_Y = 75;
-	const int32_t Player::sPLAYER_HEIGHT = 45;
-	const int32_t Player::sPLAYER_WIDTH = 33;
-	const int32_t Player::sPLAYER_X_VELOCITY = 130;
-	const int32_t Player::sPLAYER_X_JUMP_VELOCITY = 75;
-	const int32_t Player::sPLAYER_X_JUMP_QUANTUM_VELOCITY = 10;
-	const int32_t Player::sPLAYER_GRAVITY = -685;
-	const int32_t Player::sPLAYER_Y_VELOCITY = 400;
-	const int32_t Player::sPLAYER_Y_VELOCITY_CAP = 120;
-	const int32_t Player::sPLAYER_Y_DEAD_VELOCITY = 200;
-	const int32_t Player::sPLAYER_DEAD_GRAVITY = -850;
-	const int32_t Player::sPLAYER_RESPAWN_Y_VELOCITY = -38;
-	const int32_t Player::sPLAYER_RESPAWN_START_POS_X = 240;
-	const int32_t Player::sPLAYER_RESPAWN_START_POS_Y = 450;
-	const int32_t Player::sPLAYER_RESPAWN_STOP_POS_Y = 400;
+	const float Player::sPLAYER_1_INITIAL_POS_X = 135.0f;
+	const float Player::sPLAYER_1_INITIAL_POS_Y = 75.0f;
+	const float Player::sPLAYER_X_VELOCITY = 130.0f;
+	const float Player::sPLAYER_X_JUMP_VELOCITY = 75.0f;
+	const float Player::sPLAYER_X_JUMP_QUANTUM_VELOCITY = 10.0f;
+	const float Player::sPLAYER_GRAVITY = -685.0f;
+	const float Player::sPLAYER_Y_VELOCITY = 400.0f;
+	const float Player::sPLAYER_Y_VELOCITY_CAP = 120.0f;
+	const float Player::sPLAYER_Y_DEAD_VELOCITY = 200.0f;
+	const float Player::sPLAYER_DEAD_GRAVITY = -850.0f;
+	const float Player::sPLAYER_RESPAWN_Y_VELOCITY = -38.0f;
+	const float Player::sPLAYER_RESPAWN_START_POS_X = 240.0f;
+	const float Player::sPLAYER_RESPAWN_START_POS_Y = 450.0f;
+	const float Player::sPLAYER_RESPAWN_STOP_POS_Y = 400.0f;
 
 	const int32_t Player::sKILL_SCORE = 800;
 	const int32_t Player::sFLIP_SCORE = 10;
 
-	const int32_t Player::sPLAYER_LIVES_X_POS = 126;
-	const int32_t Player::sPLAYER_LIVES_Y_POS = 390;
-	const int32_t Player::sPLAYER_LIVES_WIDTH = 16;
-	const int32_t Player::sPLAYER_LIVES_HEIGHT = 12;
-	const int32_t Player::sDISTANCE_BETWEEN_LIVES = 10;
+	const float Player::sPLAYER_LIVES_X_POS = 126.0f;
+	const float Player::sPLAYER_LIVES_Y_POS = 390.0f;
+	const float Player::sPLAYER_LIVES_WIDTH = 16.0f;
+	const float Player::sPLAYER_LIVES_HEIGHT = 12.0f;
+	const float Player::sDISTANCE_BETWEEN_LIVES = 10.0f;
 
 	const int32_t Player::sNUMBER_OF_LIVES = 3;
 
-	const int32_t Player::sATTACK_WAIT_DURATION = 300;
-	const int32_t Player::sPLAYER_DEAD_WAIT_DURATION = 1000;
-	const int32_t Player::sPLAYER_RESPAWN_WAIT_DURATION = 12000;
-	const int32_t Player::sPLAYER_MOVE_SPRITE_SPEED = 30;
-	const int32_t Player::sPADDLE_SPRITE_SPEED = sPLAYER_RESPAWN_WAIT_DURATION / 3;
-	const int32_t Player::sSLIP_DURATION_CAP = 150;
+	const float Player::sATTACK_WAIT_DURATION = 300.0f;
+	const float Player::sPLAYER_DEAD_WAIT_DURATION = 1000.0f;
+	const float Player::sPLAYER_RESPAWN_WAIT_DURATION = 12000.0f;
+	const float Player::sPLAYER_MOVE_SPRITE_SPEED = 30.0f;
+	const float Player::sPADDLE_SPRITE_SPEED = sPLAYER_RESPAWN_WAIT_DURATION / 3.0f;
+	const float Player::sSLIP_DURATION_CAP = 150.0f;
 
-	const int32_t Player::sPADDLE_WIDTH = 31;
-	const int32_t Player::sPADDLE_HEIGHT = 12;
+	const float Player::sPADDLE_WIDTH = 31.0f;
+	const float Player::sPADDLE_HEIGHT = 12.0f;
 
-	const XMFLOAT2 Player::sSPRITE_SCALE(33.0f, 45.0f);
+	const float	Player::sWIDTH(33.0f);
+	const float	Player::sHEIGHT(45.0f);
 
-	const float	Player::sWIDTH(sSPRITE_SCALE.x);
-	const float	Player::sHEIGHT(sSPRITE_SCALE.y);
+	const float	Player::sHALFWIDTH(sWIDTH / 2.0f);
 
-	const float	Player::sHALFWIDTH(sSPRITE_SCALE.x / 2.0f);
+	const XMFLOAT2 Player::sPLAYER_SPRITE_SCALE(sWIDTH, sHEIGHT);
+	const XMFLOAT2 Player::sPLAYER_LIVES_SPRITE_SCALE(sPLAYER_LIVES_WIDTH, sPLAYER_LIVES_HEIGHT);
 	/******************************************************************/
 
-	Player::Player(const shared_ptr<DX::DeviceResources>& deviceResources, const shared_ptr<Camera>& camera, const std::shared_ptr<DX::KeyboardComponent> keyboard)
-		:DrawableGameComponent(deviceResources, camera), mLoadingComplete(false), mIndexCount(0), mTextureTransform(DX::MatrixHelper::Identity), CurrentPlayerState(nullptr),
-		mOrthoWidth(OrthographicCamera::DefaultViewWidth), mOrthoHeight(OrthographicCamera::DefaultViewHeight), mAnimator(Animator::GetInstance()), mKeyboard(keyboard)
-		//mCurrentAnimation(mAnimator->mMarioIdle), mLivesAnimation(mAnimator->mMarioLives), mPaddleAnimation(mAnimator->mPaddle)
+	Player::Player(const shared_ptr<DX::DeviceResources>& deviceResources, const shared_ptr<Camera>& camera, const shared_ptr<KeyboardComponent>& keyboard, const shared_ptr<GamePadComponent>& gamePad)
+		:DrawableGameComponent(deviceResources, camera), mKeyboard(keyboard), mGamePad(gamePad), mLoadingComplete(false), mIndexCount(0),
+		mTextureTransform(MatrixHelper::Identity), CurrentPlayerState(nullptr), mOrthoWidth(OrthographicCamera::DefaultViewWidth),
+		mOrthoHeight(OrthographicCamera::DefaultViewHeight), mAnimator(Animator::GetInstance())
 	{
-		mGamePad = make_shared<GamePadComponent>(mDeviceResources);
-		//mCurrentAnimation(mAnimator->mMarioIdle), mLivesAnimation(mAnimator->mMarioLives), mPaddleAnimation(mAnimator->mPaddle)
 		mCurrentAnimation = &mAnimator->mMarioIdle;
 		mLivesAnimation = &mAnimator->mMarioLives;
 		mPaddleAnimation = &mAnimator->mPaddle;
@@ -146,6 +143,7 @@ namespace GameEntity
 
 		auto loadSpriteSheetAndCreateSpritesTask = (createPSTask && createVSTask).then([this]() {
 			ThrowIfFailed(CreateWICTextureFromFile(mDeviceResources->GetD3DDevice(), L"Content\\Textures\\Mario.png", nullptr, mSpriteSheet.ReleaseAndGetAddressOf()));
+			InitiazeIndexes();
 		});
 
 		// Once the cube is loaded, the object is ready to be rendered.
@@ -169,19 +167,10 @@ namespace GameEntity
 
 	void Player::Update(const StepTimer& timer)
 	{
-		//TODO
-		timer;
-
-		//inputManager->UpdateDeBounceKeys();
-
 		if (CurrentPlayerState != nullptr)
 		{
 			CurrentPlayerState(timer);
 		}
-
-		/*mYVelocity += mGravity* ((float_t)milliseconds / 1000);
-		mPosY += mYVelocity* ((float_t)milliseconds / 1000);
-		mPosX += mXVelocity * ((float_t)milliseconds / 1000);*/
 
 		mYVelocity += mGravity * static_cast<float>(timer.GetElapsedSeconds());
 		mPosY += mYVelocity * static_cast<float>(timer.GetElapsedSeconds());
@@ -222,43 +211,15 @@ namespace GameEntity
 
 	void Player::Render(const StepTimer& timer)
 	{
-		//TODO
-		timer;
-		SetupVertexAndIndexBuffer(timer);
-
 		// Loading is asynchronous. Only draw geometry after it's loaded.
 		if (!mLoadingComplete)
 		{
 			return;
 		}
 
-		ID3D11DeviceContext* direct3DDeviceContext = mDeviceResources->GetD3DDeviceContext();
-		direct3DDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		direct3DDeviceContext->IASetInputLayout(mInputLayout.Get());
-
-		static const UINT stride = sizeof(VertexPositionTexture);
-		static const UINT offset = 0;
-		direct3DDeviceContext->IASetVertexBuffers(0, 1, mVertexBuffer.GetAddressOf(), &stride, &offset);
-		direct3DDeviceContext->IASetIndexBuffer(mIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-		direct3DDeviceContext->VSSetShader(mVertexShader.Get(), nullptr, 0);
-		direct3DDeviceContext->PSSetShader(mPixelShader.Get(), nullptr, 0);
-		direct3DDeviceContext->VSSetConstantBuffers(0, 1, mVSCBufferPerObject.GetAddressOf());
-		direct3DDeviceContext->PSSetShaderResources(0, 1, mSpriteSheet.GetAddressOf());
-		direct3DDeviceContext->PSSetSamplers(0, 1, mTextureSampler.GetAddressOf());
-		direct3DDeviceContext->OMSetBlendState(mAlphaBlending.Get(), 0, 0xFFFFFFFF);
-
-		//Drawing sprite
-		XMFLOAT2 position(mPosX, mPosY);
-		Transform2D transform(position, 0.0f, sSPRITE_SCALE);
-		const XMMATRIX wvp = XMMatrixTranspose(transform.WorldMatrix() * mCamera->ViewProjectionMatrix());
-		XMStoreFloat4x4(&mVSCBufferPerObjectData.WorldViewProjection, wvp);
-
-		XMMATRIX textureTransform = XMLoadFloat4x4(&mTextureTransform);
-		XMStoreFloat4x4(&mVSCBufferPerObjectData.TextureTransform, XMMatrixTranspose(textureTransform));
-		direct3DDeviceContext->UpdateSubresource(mVSCBufferPerObject.Get(), 0, nullptr, &mVSCBufferPerObjectData, 0, 0);
-
-		direct3DDeviceContext->DrawIndexed(mIndexCount, 0, 0);
+		RenderPlayerSprites(timer);
+		RenderPlayerLives(timer);
+		RenderPlayerScore(timer);
 	}
 
 	void Player::ResetPlayer()
@@ -320,9 +281,46 @@ namespace GameEntity
 		mPlayerScore = 0;
 	}
 
-	void Player::SetupVertexAndIndexBuffer(const StepTimer& timer)
+	void Player::SetupVertices(float xTextureCoord, float yTextureCoord, float textureCoordWidth, float textureCoordHeight)
 	{
-		switch (currentState)
+		//Top left pivot - right faced
+		mVertices[0] = VertexPositionTexture(XMFLOAT4(0.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, textureCoordHeight));				//Bottom left
+		mVertices[1] = VertexPositionTexture(XMFLOAT4(0.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, yTextureCoord));						//Top left
+		mVertices[2] = VertexPositionTexture(XMFLOAT4(1.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, yTextureCoord));							//Top right
+		mVertices[3] = VertexPositionTexture(XMFLOAT4(1.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, textureCoordHeight));					//Bottom right
+
+		D3D11_BUFFER_DESC vertexBufferDesc = { 0 };
+		vertexBufferDesc.ByteWidth = sizeof(VertexPositionTexture) * ARRAYSIZE(mVertices);
+		vertexBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+		vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+		D3D11_SUBRESOURCE_DATA vertexSubResourceData = { 0 };
+		vertexSubResourceData.pSysMem = mVertices;
+		ThrowIfFailed(mDeviceResources->GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &vertexSubResourceData, mVertexBuffer.ReleaseAndGetAddressOf()));
+	}
+
+	void Player::BindBuffers()
+	{
+		ID3D11DeviceContext* direct3DDeviceContext = mDeviceResources->GetD3DDeviceContext();
+		direct3DDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		direct3DDeviceContext->IASetInputLayout(mInputLayout.Get());
+
+		static const UINT stride = sizeof(VertexPositionTexture);
+		static const UINT offset = 0;
+		direct3DDeviceContext->IASetVertexBuffers(0, 1, mVertexBuffer.GetAddressOf(), &stride, &offset);
+		direct3DDeviceContext->IASetIndexBuffer(mIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		direct3DDeviceContext->VSSetShader(mVertexShader.Get(), nullptr, 0);
+		direct3DDeviceContext->PSSetShader(mPixelShader.Get(), nullptr, 0);
+		direct3DDeviceContext->VSSetConstantBuffers(0, 1, mVSCBufferPerObject.GetAddressOf());
+		direct3DDeviceContext->PSSetShaderResources(0, 1, mSpriteSheet.GetAddressOf());
+		direct3DDeviceContext->PSSetSamplers(0, 1, mTextureSampler.GetAddressOf());
+		direct3DDeviceContext->OMSetBlendState(mAlphaBlending.Get(), 0, 0xFFFFFFFF);
+	}
+
+	void Player::UpdatePlayerSpriteData(const StepTimer& timer)
+	{
+		switch (mCurrentState)
 		{
 		case PlayerState::RESPAWNING:
 			mPaddleSpriteSpeed += timer.GetElapsedMilliSeconds();
@@ -331,7 +329,8 @@ namespace GameEntity
 				mPaddleSpriteIndex++;
 				mPaddleSpriteSpeed = 0;
 			}
-			RenderPaddle();
+			//TODO move this
+			RenderPaddle(timer);
 			break;
 		case PlayerState::RUNNING:
 		case PlayerState::FALLING:
@@ -346,56 +345,12 @@ namespace GameEntity
 				mPlayerSpriteSpeed = 0;
 			}
 			break;
-		default:
-			break;
 		}
+	}
 
-		float xTextureCoord = mCurrentAnimation->mDimensions[mPlayerSpriteIndex].mPosX / mCurrentAnimation->mSpriteWidth;
-		float yTextureCoord = mCurrentAnimation->mDimensions[mPlayerSpriteIndex].mPosY / mCurrentAnimation->mSpriteHeight;
-		float textureCoordWidth = (mCurrentAnimation->mDimensions[mPlayerSpriteIndex].mPosX + mCurrentAnimation->mDimensions[mPlayerSpriteIndex].mWidth) / mCurrentAnimation->mSpriteWidth;
-		float textureCoordHeight = (mCurrentAnimation->mDimensions[mPlayerSpriteIndex].mPosY + mCurrentAnimation->mDimensions[mPlayerSpriteIndex].mHeight) / mCurrentAnimation->mSpriteHeight;
-
-		VertexPositionTexture vertices[4];
-		if (mIsMovingRight)
-		{
-			//Top left pivot - right faced
-			vertices[0] = VertexPositionTexture(XMFLOAT4(0.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, textureCoordHeight));				//Bottom left
-			vertices[1] = VertexPositionTexture(XMFLOAT4(0.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, yTextureCoord));						//Top left
-			vertices[2] = VertexPositionTexture(XMFLOAT4(1.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, yTextureCoord));							//Top right
-			vertices[3] = VertexPositionTexture(XMFLOAT4(1.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, textureCoordHeight));					//Bottom right
-		}
-		else
-		{
-
-			//Top left pivot - left faced
-			vertices[0] = VertexPositionTexture(XMFLOAT4(0.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, textureCoordHeight));					//Bottom left
-			vertices[1] = VertexPositionTexture(XMFLOAT4(0.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, yTextureCoord));							//Top left
-			vertices[2] = VertexPositionTexture(XMFLOAT4(1.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, yTextureCoord));						//Top right
-			vertices[3] = VertexPositionTexture(XMFLOAT4(1.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, textureCoordHeight));				//Bottom right
-
-			//Bottom left pivot - left faced
-			//VertexPositionTexture(XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f)),						//Bottom left
-			//VertexPositionTexture(XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f)),						//Top left
-			//VertexPositionTexture(XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f)),						//Top right
-			//VertexPositionTexture(XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f)),						//Bottom right
-
-			//Bottom left pivot - right faced
-			//VertexPositionTexture(XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f)),						
-			//VertexPositionTexture(XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f)),						
-			//VertexPositionTexture(XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f)),						
-			//VertexPositionTexture(XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f)),						
-
-		}
-		D3D11_BUFFER_DESC vertexBufferDesc = { 0 };
-		vertexBufferDesc.ByteWidth = sizeof(VertexPositionTexture) * ARRAYSIZE(vertices);
-		vertexBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
-		vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-		D3D11_SUBRESOURCE_DATA vertexSubResourceData = { 0 };
-		vertexSubResourceData.pSysMem = vertices;
-		ThrowIfFailed(mDeviceResources->GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &vertexSubResourceData, mVertexBuffer.ReleaseAndGetAddressOf()));
-
-		// Create and index buffer
+	void Player::InitiazeIndexes()
+	{
+		// Create an index buffer
 		const uint32_t indices[] =
 		{
 			0, 1, 2,
@@ -414,18 +369,112 @@ namespace GameEntity
 		ThrowIfFailed(mDeviceResources->GetD3DDevice()->CreateBuffer(&indexBufferDesc, &indexSubResourceData, mIndexBuffer.ReleaseAndGetAddressOf()));
 	}
 
-	void Player::RenderPlayerScore()
+	void Player::DrawIndividualSprite(float xPosition, float yPosition, const XMFLOAT2& spriteScale)
 	{
+		//Drawing sprites		
+		ID3D11DeviceContext* direct3DDeviceContext = mDeviceResources->GetD3DDeviceContext();
+		XMFLOAT2 position(xPosition, yPosition);
+		Transform2D transform(position, 0.0f, spriteScale);
+		XMMATRIX wvp = XMMatrixTranspose(transform.WorldMatrix() * mCamera->ViewProjectionMatrix());
+		XMStoreFloat4x4(&mVSCBufferPerObjectData.WorldViewProjection, wvp);
+
+		XMMATRIX textureTransform = XMLoadFloat4x4(&mTextureTransform);
+		XMStoreFloat4x4(&mVSCBufferPerObjectData.TextureTransform, XMMatrixTranspose(textureTransform));
+		direct3DDeviceContext->UpdateSubresource(mVSCBufferPerObject.Get(), 0, nullptr, &mVSCBufferPerObjectData, 0, 0);
+
+		direct3DDeviceContext->DrawIndexed(mIndexCount, 0, 0);
 	}
 
-	void Player::RenderPlayerLives()
+	void Player::RenderPlayerScore(const StepTimer& timer)
 	{
 		//TODO
+		timer;
 	}
 
-	void Player::RenderPaddle()
+	void Player::RenderPlayerSprites(const StepTimer& timer)
+	{
+		UpdatePlayerSpriteData(timer);
+
+		float xTextureCoord = mCurrentAnimation->mDimensions[mPlayerSpriteIndex].mPosX / mCurrentAnimation->mSpriteWidth;
+		float yTextureCoord = mCurrentAnimation->mDimensions[mPlayerSpriteIndex].mPosY / mCurrentAnimation->mSpriteHeight;
+		float textureCoordWidth = (mCurrentAnimation->mDimensions[mPlayerSpriteIndex].mPosX + mCurrentAnimation->mDimensions[mPlayerSpriteIndex].mWidth) / mCurrentAnimation->mSpriteWidth;
+		float textureCoordHeight = (mCurrentAnimation->mDimensions[mPlayerSpriteIndex].mPosY + mCurrentAnimation->mDimensions[mPlayerSpriteIndex].mHeight) / mCurrentAnimation->mSpriteHeight;
+
+		if (mIsMovingRight)
+		{
+			SetupVertices(xTextureCoord, yTextureCoord, textureCoordWidth, textureCoordHeight);
+		}
+		else
+		{
+			SetupVertices(textureCoordWidth, yTextureCoord, xTextureCoord, textureCoordHeight);
+		}		
+
+		BindBuffers();
+
+		//Drawing sprites
+		DrawIndividualSprite(mPosX, mPosY, sPLAYER_SPRITE_SCALE);
+		if (mIsRenderDuplicateSprites)
+		{
+			DrawIndividualSprite(mXDuplicatePlayer, mPosY, sPLAYER_SPRITE_SCALE);
+		}
+	}
+
+	void Player::RenderPlayerLives(const StepTimer& timer)
+	{
+		//Unreferenced parameter
+		timer;
+
+		float xPos = sPLAYER_LIVES_X_POS;
+		float yPos = sPLAYER_LIVES_Y_POS;
+
+		float xTextureCoord = mLivesAnimation->mDimensions[0].mPosX / mLivesAnimation->mSpriteWidth;
+		float yTextureCoord = mLivesAnimation->mDimensions[0].mPosY / mLivesAnimation->mSpriteHeight;
+		float textureCoordWidth = (mLivesAnimation->mDimensions[0].mPosX + mLivesAnimation->mDimensions[0].mWidth) / mLivesAnimation->mSpriteWidth;
+		float textureCoordHeight = (mLivesAnimation->mDimensions[0].mPosY + mLivesAnimation->mDimensions[0].mHeight) / mLivesAnimation->mSpriteHeight;
+
+		//Top left pivot - right faced
+		mVertices[0] = VertexPositionTexture(XMFLOAT4(0.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, textureCoordHeight));				//Bottom left
+		mVertices[1] = VertexPositionTexture(XMFLOAT4(0.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, yTextureCoord));						//Top left
+		mVertices[2] = VertexPositionTexture(XMFLOAT4(1.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, yTextureCoord));							//Top right
+		mVertices[3] = VertexPositionTexture(XMFLOAT4(1.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, textureCoordHeight));					//Bottom right	
+
+		D3D11_BUFFER_DESC vertexBufferDesc = { 0 };
+		vertexBufferDesc.ByteWidth = sizeof(VertexPositionTexture) * ARRAYSIZE(mVertices);
+		vertexBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+		vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+		D3D11_SUBRESOURCE_DATA vertexSubResourceData = { 0 };
+		vertexSubResourceData.pSysMem = mVertices;
+		ThrowIfFailed(mDeviceResources->GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &vertexSubResourceData, mVertexBuffer.ReleaseAndGetAddressOf()));
+
+
+		ID3D11DeviceContext* direct3DDeviceContext = mDeviceResources->GetD3DDeviceContext();
+		direct3DDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		direct3DDeviceContext->IASetInputLayout(mInputLayout.Get());
+
+		static const UINT stride = sizeof(VertexPositionTexture);
+		static const UINT offset = 0;
+		direct3DDeviceContext->IASetVertexBuffers(0, 1, mVertexBuffer.GetAddressOf(), &stride, &offset);
+		direct3DDeviceContext->IASetIndexBuffer(mIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		direct3DDeviceContext->VSSetShader(mVertexShader.Get(), nullptr, 0);
+		direct3DDeviceContext->PSSetShader(mPixelShader.Get(), nullptr, 0);
+		direct3DDeviceContext->VSSetConstantBuffers(0, 1, mVSCBufferPerObject.GetAddressOf());
+		direct3DDeviceContext->PSSetShaderResources(0, 1, mSpriteSheet.GetAddressOf());
+		direct3DDeviceContext->PSSetSamplers(0, 1, mTextureSampler.GetAddressOf());
+		direct3DDeviceContext->OMSetBlendState(mAlphaBlending.Get(), 0, 0xFFFFFFFF);
+
+		for (int i = 0; i < mLivesLeft - 1; i++)
+		{
+			DrawIndividualSprite(xPos, yPos, sPLAYER_LIVES_SPRITE_SCALE);
+			xPos += sPLAYER_LIVES_WIDTH + sDISTANCE_BETWEEN_LIVES;
+		}
+	}
+
+	void Player::RenderPaddle(const StepTimer& timer)
 	{
 		//TODO
+		timer;
 	}
 
 	void Player::ResetPlayerSprites()
@@ -447,9 +496,9 @@ namespace GameEntity
 
 	void Player::ChangeState(PlayerState state, bool isChangeSprite)
 	{
-		currentState = state;
+		mCurrentState = state;
 
-		switch (currentState)
+		switch (mCurrentState)
 		{
 		case PlayerState::ONGROUND:
 			if (isChangeSprite)
