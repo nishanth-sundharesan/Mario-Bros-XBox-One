@@ -275,7 +275,7 @@ namespace GameEntity
 #endif
 	}
 
-	void Player::Init()
+	void Player::ResetScoreAndLives()
 	{
 		mLivesLeft = sNUMBER_OF_LIVES;
 		mPlayerScore = 0;
@@ -284,10 +284,10 @@ namespace GameEntity
 	void Player::SetupVertices(float xTextureCoord, float yTextureCoord, float textureCoordWidth, float textureCoordHeight)
 	{
 		//Top left pivot - right faced
-		mVertices[0] = VertexPositionTexture(XMFLOAT4(0.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, textureCoordHeight));				//Bottom left
-		mVertices[1] = VertexPositionTexture(XMFLOAT4(0.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, yTextureCoord));						//Top left
-		mVertices[2] = VertexPositionTexture(XMFLOAT4(1.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, yTextureCoord));							//Top right
-		mVertices[3] = VertexPositionTexture(XMFLOAT4(1.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, textureCoordHeight));					//Bottom right
+		mVertices[0] = VertexPositionTexture(XMFLOAT4(0.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, textureCoordHeight));				//Bottom left
+		mVertices[1] = VertexPositionTexture(XMFLOAT4(0.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, yTextureCoord));						//Top left
+		mVertices[2] = VertexPositionTexture(XMFLOAT4(1.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, yTextureCoord));					//Top right
+		mVertices[3] = VertexPositionTexture(XMFLOAT4(1.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, textureCoordHeight));			//Bottom right
 
 		D3D11_BUFFER_DESC vertexBufferDesc = { 0 };
 		vertexBufferDesc.ByteWidth = sizeof(VertexPositionTexture) * ARRAYSIZE(mVertices);
@@ -402,11 +402,11 @@ namespace GameEntity
 
 		if (mIsMovingRight)
 		{
-			SetupVertices(xTextureCoord, yTextureCoord, textureCoordWidth, textureCoordHeight);
+			SetupVertices(textureCoordWidth, yTextureCoord, xTextureCoord, textureCoordHeight);
 		}
 		else
 		{
-			SetupVertices(textureCoordWidth, yTextureCoord, xTextureCoord, textureCoordHeight);
+			SetupVertices(xTextureCoord, yTextureCoord, textureCoordWidth, textureCoordHeight);			
 		}		
 
 		BindBuffers();
@@ -432,37 +432,9 @@ namespace GameEntity
 		float textureCoordWidth = (mLivesAnimation->mDimensions[0].mPosX + mLivesAnimation->mDimensions[0].mWidth) / mLivesAnimation->mSpriteWidth;
 		float textureCoordHeight = (mLivesAnimation->mDimensions[0].mPosY + mLivesAnimation->mDimensions[0].mHeight) / mLivesAnimation->mSpriteHeight;
 
-		//Top left pivot - right faced
-		mVertices[0] = VertexPositionTexture(XMFLOAT4(0.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, textureCoordHeight));				//Bottom left
-		mVertices[1] = VertexPositionTexture(XMFLOAT4(0.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, yTextureCoord));						//Top left
-		mVertices[2] = VertexPositionTexture(XMFLOAT4(1.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, yTextureCoord));							//Top right
-		mVertices[3] = VertexPositionTexture(XMFLOAT4(1.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, textureCoordHeight));					//Bottom right	
+		SetupVertices(xTextureCoord, yTextureCoord, textureCoordWidth, textureCoordHeight);		
 
-		D3D11_BUFFER_DESC vertexBufferDesc = { 0 };
-		vertexBufferDesc.ByteWidth = sizeof(VertexPositionTexture) * ARRAYSIZE(mVertices);
-		vertexBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
-		vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-		D3D11_SUBRESOURCE_DATA vertexSubResourceData = { 0 };
-		vertexSubResourceData.pSysMem = mVertices;
-		ThrowIfFailed(mDeviceResources->GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &vertexSubResourceData, mVertexBuffer.ReleaseAndGetAddressOf()));
-
-
-		ID3D11DeviceContext* direct3DDeviceContext = mDeviceResources->GetD3DDeviceContext();
-		direct3DDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		direct3DDeviceContext->IASetInputLayout(mInputLayout.Get());
-
-		static const UINT stride = sizeof(VertexPositionTexture);
-		static const UINT offset = 0;
-		direct3DDeviceContext->IASetVertexBuffers(0, 1, mVertexBuffer.GetAddressOf(), &stride, &offset);
-		direct3DDeviceContext->IASetIndexBuffer(mIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-		direct3DDeviceContext->VSSetShader(mVertexShader.Get(), nullptr, 0);
-		direct3DDeviceContext->PSSetShader(mPixelShader.Get(), nullptr, 0);
-		direct3DDeviceContext->VSSetConstantBuffers(0, 1, mVSCBufferPerObject.GetAddressOf());
-		direct3DDeviceContext->PSSetShaderResources(0, 1, mSpriteSheet.GetAddressOf());
-		direct3DDeviceContext->PSSetSamplers(0, 1, mTextureSampler.GetAddressOf());
-		direct3DDeviceContext->OMSetBlendState(mAlphaBlending.Get(), 0, 0xFFFFFFFF);
+		BindBuffers();
 
 		for (int i = 0; i < mLivesLeft - 1; i++)
 		{

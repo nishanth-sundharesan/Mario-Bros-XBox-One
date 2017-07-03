@@ -49,7 +49,7 @@ namespace GameEntity
 		void CollidedWithFloor(float newPlayerYPosition);
 		void PlayerAttacked(float newPlayerYPosition);
 		void GotKilled();
-		void Init();
+		void ResetScoreAndLives();
 	private:		
 
 		struct VSCBufferPerObject
@@ -91,20 +91,20 @@ namespace GameEntity
 		std::uint32_t mIndexCount;
 		bool mLoadingComplete;
 
+		//Sprite transforms
+		DirectX::XMFLOAT4X4 mTextureTransform;
+		DX::VertexPositionTexture mVertices[4];
+		DX::TextureCoordinates mTextureCoordinates;
+
 		//Inputs
 		std::shared_ptr<DX::KeyboardComponent> mKeyboard;
 		std::shared_ptr<DX::GamePadComponent> mGamePad;		
 
-		//Sprite transforms
-		DirectX::XMFLOAT4X4 mTextureTransform;
-
 		const float mOrthoWidth;
 		const float mOrthoHeight;
-
-		DX::VertexPositionTexture mVertices[4];
-		std::shared_ptr<Animation::Animator> mAnimator;
-		DX::TextureCoordinates mTextureCoordinates;
 		
+		std::shared_ptr<Animation::Animator> mAnimator;
+				
 		//Player specific
 		float mPosX;
 		float mPosY;
@@ -132,10 +132,7 @@ namespace GameEntity
 		float mPaddleSpriteSpeed;
 
 		long mPlayerScore;
-		std::int32_t mLivesLeft;
-		/*GLuint mSpriteBuffer;
-		SpriteRenderer *renderer;		
-		InputManager *inputManager;*/		
+		std::int32_t mLivesLeft;			
 
 		void RenderPlayerSprites(const DX::StepTimer& timer);
 		void RenderPlayerLives(const DX::StepTimer& timer);
@@ -210,6 +207,6 @@ namespace GameEntity
 		static const float sHALFWIDTH;
 		static const DirectX::XMFLOAT2 sPLAYER_SPRITE_SCALE;
 		static const DirectX::XMFLOAT2 sPLAYER_LIVES_SPRITE_SCALE;
-		/******************************************************************/
+		/*******************************************************************/
 	};
 }
