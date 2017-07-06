@@ -6,6 +6,7 @@ using namespace DX;
 using namespace DirectX;
 using namespace Managers;
 using namespace Animation;
+using namespace Audio;
 
 namespace GameEntity
 {
@@ -217,6 +218,36 @@ namespace GameEntity
 
 	void Crab::Render(const StepTimer& timer)
 	{
+		// Loading is asynchronous. Only draw geometry after it's loaded.
+		if (!mLoadingComplete)
+		{
+			return;
+		}
+
+		UpdateEnemySpriteData(timer);
+
+		float xTextureCoord = mCurrentAnimation->mDimensions[mSpriteIndex].mPosX / mCurrentAnimation->mSpriteWidth;
+		float yTextureCoord = mCurrentAnimation->mDimensions[mSpriteIndex].mPosY / mCurrentAnimation->mSpriteHeight;
+		float textureCoordWidth = (mCurrentAnimation->mDimensions[mSpriteIndex].mPosX + mCurrentAnimation->mDimensions[mSpriteIndex].mWidth) / mCurrentAnimation->mSpriteWidth;
+		float textureCoordHeight = (mCurrentAnimation->mDimensions[mSpriteIndex].mPosY + mCurrentAnimation->mDimensions[mSpriteIndex].mHeight) / mCurrentAnimation->mSpriteHeight;
+
+		if (mIsMovingRight)
+		{
+			SetupVertices(textureCoordWidth, yTextureCoord, xTextureCoord, textureCoordHeight);
+		}
+		else
+		{
+			SetupVertices(xTextureCoord, yTextureCoord, textureCoordWidth, textureCoordHeight);
+		}
+
+		BindBuffers();
+
+		//Drawing sprites
+		DrawIndividualSprite(mPosX, mPosY, sENEMY_SPRITE_SCALE);
+		if (mIsRenderDuplicateSprites)
+		{
+			DrawIndividualSprite(mXDuplicateEnemy, mPosY, sENEMY_SPRITE_SCALE);
+		}
 	}
 
 	void Crab::CollidedWithFloor(float newEnemyYPosition, EnemyState previousState)
@@ -316,7 +347,7 @@ namespace GameEntity
 				mCurrentState = EnemyState::FALLING;
 			}
 		}
-		//SoundManager::GetInstance()->PlayEnemyFlipSound();
+		SoundManager::GetInstance()->PlayEnemyFlipSound();
 	}
 
 	void Crab::EvolveTheEnemy()
@@ -357,11 +388,11 @@ namespace GameEntity
 
 		mCurrentState = EnemyState::DEAD;
 
-		//SoundManager::GetInstance()->PlayPlayerKickSound();
+		SoundManager::GetInstance()->PlayPlayerKickSound();
 
 		if (!mEnemyManager.CheckIfLastEnemy())
 		{
-			//SoundManager::GetInstance()->PlayEnemyFallingSound();
+			SoundManager::GetInstance()->PlayEnemyFallingSound();
 		}
 	}
 
@@ -459,5 +490,74 @@ namespace GameEntity
 		direct3DDeviceContext->UpdateSubresource(mVSCBufferPerObject.Get(), 0, nullptr, &mVSCBufferPerObjectData, 0, 0);
 
 		direct3DDeviceContext->DrawIndexed(mIndexCount, 0, 0);
+	}
+
+	void Crab::UpdateEnemySpriteData(const StepTimer& timer)
+	{
+		switch (mCurrentState)
+		{
+		case EnemyState::MOVING:
+		case EnemyState::SPAWNING:
+		case EnemyState::RESPAWNING:
+		case EnemyState::FALLING:
+			if (mIsAngry)
+			{
+				mCurrentAnimation = &mCrabSprites.mAngryMoving;
+			}
+			else
+			{
+				mCurrentAnimation = &mCrabSprites.mMoving;
+			}
+
+			mSpriteSpeed += timer.GetElapsedMilliSeconds();
+			if (mSpriteSpeed > sCRAB_MOVE_SPRITE_SPEED)
+			{
+				mSpriteIndex++;
+				if (mSpriteIndex > mCurrentAnimation->mLength - 1)
+				{
+					mSpriteIndex = 0;
+				}
+				mSpriteSpeed = 0;
+			}
+			break;
+
+		case EnemyState::FLIPPED:
+			mCurrentAnimation = &mCrabSprites.mFlipped;
+			mSpriteSpeed += timer.GetElapsedMilliSeconds();
+			if (mSpriteSpeed > mFlipSpriteCap)
+			{
+				mFlipSpriteCap -= sCRAB_FLIP_DELTA_SPRITE_SPEED;
+				if (mFlipSpriteCap < 0)
+				{
+					mFlipSpriteCap = sCRAB_FLIP_DELTA_SPRITE_SPEED;
+				}
+
+				mSpriteIndex++;
+				if (mSpriteIndex > mCurrentAnimation->mLength - 1)
+				{
+					mSpriteIndex = 0;
+				}
+				mSpriteSpeed = 0;
+			}
+			break;
+
+		case EnemyState::DEAD:
+			mCurrentAnimation = &mCrabSprites.mFlipped;
+			break;
+
+		case EnemyState::LOOKAROUND:
+			mCurrentAnimation = &mCrabSprites.mLookAround;
+			mSpriteSpeed += timer.GetElapsedMilliSeconds();
+			if (mSpriteSpeed > sCRAB_LOOK_AROUND_SPRITE_SPEED)
+			{
+				mSpriteIndex++;
+				if (mSpriteIndex > mCurrentAnimation->mLength - 1)
+				{
+					mSpriteIndex = 0;
+				}
+				mSpriteSpeed = 0;
+			}
+			break;
+		}
 	}
 }

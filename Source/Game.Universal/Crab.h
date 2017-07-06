@@ -86,6 +86,8 @@ namespace GameEntity
 		bool mIsAngry;
 		float mCurrentStateAngryXVelocity;
 
+		void UpdateEnemySpriteData(const DX::StepTimer& timer);
+
 		/******************* Crab Constants ******************************/
 		static const float sCRAB_Y_VELOCITY;
 
