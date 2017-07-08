@@ -14,11 +14,10 @@ namespace GameEntity
 		~Background() = default;
 
 		virtual void CreateDeviceDependentResources() override;
-		virtual void ReleaseDeviceDependentResources() override;
-		virtual void Update(const DX::StepTimer& timer) override;
+		virtual void ReleaseDeviceDependentResources() override;		
 		virtual void Render(const DX::StepTimer& timer) override;
 
-	private:
+	private:		
 		struct VSCBufferPerObject
 		{
 			DirectX::XMFLOAT4X4 WorldViewProjection;
@@ -33,7 +32,7 @@ namespace GameEntity
 			{ }
 		};
 
-		void InitializeVertices();
+		void InitializeVerticesAndIndexes();
 		void InitializeSprites();
 
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShader;
@@ -50,7 +49,16 @@ namespace GameEntity
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> mTextureSampler;
 		Microsoft::WRL::ComPtr<ID3D11BlendState> mAlphaBlending;
 
+		VSCBufferPerObject mVSCBufferPerObjectData;
+		DX::VertexPositionTexture mVertices[4];
+
+		const DirectX::XMFLOAT2 SPRITE_SCALE;
+
 		std::uint32_t mIndexCount;
 		bool mLoadingComplete;
+
+		//Sprite transforms
+		DirectX::XMFLOAT4X4 mTextureTransform;
+		DX::Transform2D mTransform;				
 	};
 }

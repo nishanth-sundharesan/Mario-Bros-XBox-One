@@ -8,9 +8,8 @@ using namespace DirectX;
 namespace GameEntity
 {
 	Background::Background(const shared_ptr<DX::DeviceResources>& deviceResources, const shared_ptr<Camera>& camera)
-		:DrawableGameComponent(deviceResources, camera)
+		:DrawableGameComponent(deviceResources, camera), mLoadingComplete(false), mIndexCount(0), SPRITE_SCALE(XMFLOAT2(OrthographicCamera::DefaultViewWidth, OrthographicCamera::DefaultViewHeight))
 	{
-		//TODO
 	}
 
 	void Background::CreateDeviceDependentResources()
@@ -63,7 +62,7 @@ namespace GameEntity
 
 			D3D11_SAMPLER_DESC samplerStateDesc;
 			ZeroMemory(&samplerStateDesc, sizeof(samplerStateDesc));
-			samplerStateDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+			samplerStateDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
 			samplerStateDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 			samplerStateDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 			samplerStateDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -88,52 +87,83 @@ namespace GameEntity
 		});
 
 		auto loadSpriteSheetAndCreateSpritesTask = (createPSTask && createVSTask).then([this]() {
-			ThrowIfFailed(CreateWICTextureFromFile(mDeviceResources->GetD3DDevice(), L"Content\\Textures\\snoods_default.png", nullptr, mSpriteSheet.ReleaseAndGetAddressOf()));
-			InitializeVertices();
+			ThrowIfFailed(CreateWICTextureFromFile(mDeviceResources->GetD3DDevice(), L"Content\\Textures\\Background.png", nullptr, mSpriteSheet.ReleaseAndGetAddressOf()));
+			InitializeVerticesAndIndexes();
 			InitializeSprites();
 		});
 
-		//Pending here
 		// Once the cube is loaded, the object is ready to be rendered.
 		loadSpriteSheetAndCreateSpritesTask.then([this]() {
-			mLoadingComplete = true;			
+			mLoadingComplete = true;
 		});
 	}
 
 	void Background::ReleaseDeviceDependentResources()
 	{
-		//TODO
-	}
-
-	void Background::Update(const StepTimer& timer)
-	{
-		//TODO 
-		timer;
+		mLoadingComplete = false;
+		mVertexShader.Reset();
+		mPixelShader.Reset();
+		mInputLayout.Reset();
+		mVertexBuffer.Reset();
+		mIndexBuffer.Reset();
+		mVSCBufferPerObject.Reset();
+		mSpriteSheet.Reset();
+		mTextureSampler.Reset();
 	}
 
 	void Background::Render(const StepTimer& timer)
 	{
-		//TODO
-		timer;
+		//Unreferenced parameter
+		timer;		
+
+		// Loading is asynchronous. Only draw geometry after it's loaded.
+		if (!mLoadingComplete)
+		{
+			return;
+		}
+
+		ID3D11DeviceContext* direct3DDeviceContext = mDeviceResources->GetD3DDeviceContext();
+		direct3DDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		direct3DDeviceContext->IASetInputLayout(mInputLayout.Get());
+
+		static const UINT stride = sizeof(VertexPositionTexture);
+		static const UINT offset = 0;
+		direct3DDeviceContext->IASetVertexBuffers(0, 1, mVertexBuffer.GetAddressOf(), &stride, &offset);
+		direct3DDeviceContext->IASetIndexBuffer(mIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		direct3DDeviceContext->VSSetShader(mVertexShader.Get(), nullptr, 0);
+		direct3DDeviceContext->PSSetShader(mPixelShader.Get(), nullptr, 0);
+		direct3DDeviceContext->VSSetConstantBuffers(0, 1, mVSCBufferPerObject.GetAddressOf());
+		direct3DDeviceContext->PSSetShaderResources(0, 1, mSpriteSheet.GetAddressOf());
+		direct3DDeviceContext->PSSetSamplers(0, 1, mTextureSampler.GetAddressOf());
+		direct3DDeviceContext->OMSetBlendState(mAlphaBlending.Get(), 0, 0xFFFFFFFF);
+
+		//Drawing sprite
+		const XMMATRIX wvp = XMMatrixTranspose(mTransform.WorldMatrix() * mCamera->ViewProjectionMatrix());
+		XMStoreFloat4x4(&mVSCBufferPerObjectData.WorldViewProjection, wvp);
+
+		XMMATRIX textureTransform = XMLoadFloat4x4(&mTextureTransform);
+		XMStoreFloat4x4(&mVSCBufferPerObjectData.TextureTransform, XMMatrixTranspose(textureTransform));
+		direct3DDeviceContext->UpdateSubresource(mVSCBufferPerObject.Get(), 0, nullptr, &mVSCBufferPerObjectData, 0, 0);
+
+		direct3DDeviceContext->DrawIndexed(mIndexCount, 0, 0);
 	}
 
-	void Background::InitializeVertices()
-	{
-		VertexPositionTexture vertices[] =
-		{
-			VertexPositionTexture(XMFLOAT4(-1.0f, -1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f)),
-			VertexPositionTexture(XMFLOAT4(-1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f)),
-			VertexPositionTexture(XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f)),
-			VertexPositionTexture(XMFLOAT4(1.0f, -1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f)),
-		};
+	void Background::InitializeVerticesAndIndexes()
+	{		
+		//Bottom left pivot - left faced
+		mVertices[0] = VertexPositionTexture(XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f));			//Bottom left
+		mVertices[1] = VertexPositionTexture(XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f));			//Top left
+		mVertices[2] = VertexPositionTexture(XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f));			//Top right
+		mVertices[3] = VertexPositionTexture(XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f));			//Bottom right	
 
 		D3D11_BUFFER_DESC vertexBufferDesc = { 0 };
-		vertexBufferDesc.ByteWidth = sizeof(VertexPositionTexture) * ARRAYSIZE(vertices);
+		vertexBufferDesc.ByteWidth = sizeof(VertexPositionTexture) * ARRAYSIZE(mVertices);
 		vertexBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
 		vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
 		D3D11_SUBRESOURCE_DATA vertexSubResourceData = { 0 };
-		vertexSubResourceData.pSysMem = vertices;
+		vertexSubResourceData.pSysMem = mVertices;
 		ThrowIfFailed(mDeviceResources->GetD3DDevice()->CreateBuffer(&vertexBufferDesc, &vertexSubResourceData, mVertexBuffer.ReleaseAndGetAddressOf()));
 
 		// Create and index buffer
@@ -157,5 +187,10 @@ namespace GameEntity
 
 	void Background::InitializeSprites()
 	{
+		XMFLOAT2 position(0.0f, 0.0f);		
+		Transform2D transform(position, 0.0f, SPRITE_SCALE);
+		mTransform = transform;
+
+		mTextureTransform = DX::MatrixHelper::Identity;
 	}
 }
