@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Phases>
+  <Phase id="1" blockType="BlueBlocks">
+    <Enemies size="3">
+      <Enemy type="Duck" spawnTime="5" spawnPosition="Left"/>
+      <Enemy type="Duck" spawnTime="10" spawnPosition="Right"/>
+      <Enemy type="Duck" spawnTime="15" spawnPosition="Left"/>
+    </Enemies>
+  </Phase>
+  <Phase id="2" blockType="BlueBlocks">
+    <Enemies size="4">
+      <Enemy type="Duck" spawnTime="4" spawnPosition="Left"/>
+      <Enemy type="Duck" spawnTime="7" spawnPosition="Right"/>
+      <Enemy type="Duck" spawnTime="12" spawnPosition="Left"/>
+      <Enemy type="Duck" spawnTime="16" spawnPosition="Right"/>
+    </Enemies>
+  </Phase>
+  <Phase id="3" blockType="BlueBlocks">
+    <Enemies size="6">
+      <Enemy type="Duck" spawnTime="4" spawnPosition="Left"/>
+      <Enemy type="Duck" spawnTime="7" spawnPosition="Right"/>
+      <Enemy type="Duck" spawnTime="12" spawnPosition="Left"/>
+      <Enemy type="Duck" spawnTime="13" spawnPosition="Right"/>
+      <Enemy type="Duck" spawnTime="18" spawnPosition="Left"/>
+      <Enemy type="Duck" spawnTime="18" spawnPosition="Right"/>
+    </Enemies>
+  </Phase>
+  <Phase id="4" blockType="BlueBlocks">
+    <Enemies size="4">      
+      <Enemy type="Crab" spawnTime="4" spawnPosition="Right"/>
+      <Enemy type="Crab" spawnTime="6" spawnPosition="Left"/>
+      <Enemy type="Crab" spawnTime="13" spawnPosition="Right"/>
+      <Enemy type="Crab" spawnTime="15" spawnPosition="Left"/>
+    </Enemies>
+  </Phase>
+  <Phase id="5" blockType="BlueBlocks">
+    <Enemies size="9">
+      <Enemy type="Duck" spawnTime="4" spawnPosition="Left"/>
+      <Enemy type="Crab" spawnTime="7" spawnPosition="Right"/>
+      <Enemy type="Duck" spawnTime="12" spawnPosition="Left"/>
+      <Enemy type="Crab" spawnTime="13" spawnPosition="Right"/>
+      <Enemy type="Duck" spawnTime="17" spawnPosition="Left"/>
+      <Enemy type="Crab" spawnTime="18" spawnPosition="Right"/>
+      <Enemy type="Duck" spawnTime="21" spawnPosition="Left"/>
+      <Enemy type="Crab" spawnTime="21" spawnPosition="Right"/>
+      <Enemy type="Duck" spawnTime="25" spawnPosition="Left"/>
+    </Enemies>
+  </Phase>
+	<Phase id="6" blockType="BlueBlocks">
+		<Enemies size="14">
+			<Enemy type="Duck" spawnTime="4" spawnPosition="Left"/>
+			<Enemy type="Crab" spawnTime="7" spawnPosition="Right"/>
+			<Enemy type="Duck" spawnTime="12" spawnPosition="Left"/>
+			<Enemy type="Crab" spawnTime="13" spawnPosition="Right"/>
+			<Enemy type="Duck" spawnTime="17" spawnPosition="Left"/>
+			<Enemy type="Crab" spawnTime="18" spawnPosition="Right"/>
+			<Enemy type="Duck" spawnTime="21" spawnPosition="Left"/>
+			<Enemy type="Crab" spawnTime="25" spawnPosition="Right"/>
+			<Enemy type="Duck" spawnTime="28" spawnPosition="Left"/>
+			<Enemy type="Duck" spawnTime="35" spawnPosition="Left"/>
+			<Enemy type="Crab" spawnTime="37" spawnPosition="Right"/>
+			<Enemy type="Duck" spawnTime="38" spawnPosition="Left"/>
+			<Enemy type="Crab" spawnTime="42" spawnPosition="Right"/>
+			<Enemy type="Duck" spawnTime="47" spawnPosition="Left"/>
+		</Enemies>
+	</Phase>
+</Phases>
