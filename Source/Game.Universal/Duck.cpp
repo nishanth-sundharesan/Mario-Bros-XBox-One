@@ -8,6 +8,7 @@ using namespace DX;
 using namespace DirectX;
 using namespace Managers;
 using namespace Animation;
+using namespace Audio;
 
 namespace GameEntity
 {
@@ -240,6 +241,10 @@ namespace GameEntity
 
 		//Drawing sprites
 		DrawIndividualSprite(mPosX, mPosY, sENEMY_SPRITE_SCALE);
+		if (mIsRenderDuplicateSprites)
+		{
+			DrawIndividualSprite(mXDuplicateEnemy, mPosY, sENEMY_SPRITE_SCALE);
+		}
 	}
 
 	void Duck::CollidedWithFloor(float newEnemyYPosition, EnemyState previousState)
@@ -320,7 +325,7 @@ namespace GameEntity
 		{
 			mCurrentState = EnemyState::FLIPPED;
 		}
-		//SoundManager::GetInstance()->PlayEnemyFlipSound();
+		SoundManager::GetInstance()->PlayEnemyFlipSound();
 	}
 
 	void Duck::EvolveTheEnemy()
@@ -358,11 +363,11 @@ namespace GameEntity
 
 		mCurrentState = EnemyState::DEAD;
 
-		//SoundManager::GetInstance()->PlayPlayerKickSound();
+		SoundManager::GetInstance()->PlayPlayerKickSound();
 
 		if (!mEnemyManager.CheckIfLastEnemy())
 		{
-			//SoundManager::GetInstance()->PlayEnemyFallingSound();
+			SoundManager::GetInstance()->PlayEnemyFallingSound();
 		}
 	}
 
