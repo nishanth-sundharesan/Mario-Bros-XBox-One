@@ -27,36 +27,35 @@ namespace Animation
 		std::int32_t mHeight;
 	};
 
-	typedef struct SpriteStruct :TextureDimensions
+	struct Sprites :TextureDimensions
 	{
 		std::vector<struct SpriteDimensions> mDimensions;
-	}Sprites;
+	};
 
-	typedef struct BeeSpriteStruct
+	struct BeeSprites
 	{
 		Sprites mMoving;
 		Sprites mFlipped;
-	}BeeSprites;
+	};
 
-	typedef struct DuckSpriteStruct :BeeSpriteStruct
+	struct DuckSprites :BeeSprites
 	{
 		Sprites mLookAround;
-	}DuckSprites;
+	};
 
-	typedef struct CrabSpriteStruct :DuckSprites
+	struct CrabSprites :DuckSprites
 	{
 		Sprites mAngryMoving;
-	}CrabSprites;
-
+	};
 
 	class Animator final
 	{
-	public:				
+	public:
 		Animator(const Animator&) = delete;
 		Animator& operator=(const Animator&) = delete;
 		Animator(Animator&&) = delete;
 		Animator& operator=(Animator&&) = delete;
-		~Animator();
+		~Animator() = default;
 
 		Sprites mMarioIdle;
 		Sprites mMarioRunning;
@@ -126,9 +125,9 @@ namespace Animation
 		const Sprites& GetCurrentStageFlexibleBlock() const;
 		void GetDuckSprites(DuckSprites& duckSprites, EnemyStage currentDuckStage) const;
 		void GetCrabSprites(CrabSprites& crabSprites, EnemyStage currentCrabStage) const;
-		
-		static std::shared_ptr<Animator> GetInstance();
-		
+
+		static Animator* GetInstance();
+
 	private:
 		Animator();
 		static Animator* sInstance;

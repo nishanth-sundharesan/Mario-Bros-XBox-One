@@ -8,11 +8,6 @@ namespace Animation
 {
 	Animator* Animator::sInstance = nullptr;
 
-	Animator::~Animator()
-	{
-		sInstance = nullptr;
-	}
-
 	const Sprites& Animator::GetCurrentStageBlock() const
 	{
 		return mBlueBlock;
@@ -70,14 +65,13 @@ namespace Animation
 		}
 	}
 
-	shared_ptr<Animator> Animator::GetInstance()
+	Animator* Animator::GetInstance()
 	{
-		if (sInstance == nullptr)													//No multi threading, so we can use expired.	
+		if (sInstance == nullptr)
 		{
 			sInstance = new Animator();
-		}
-		//sInstance = shared_ptr<Animator>(new Animator());						//Cannot call make_shared() for a class whose constructor is private/protected.		
-		return shared_ptr<Animator>(sInstance);
+		}		
+		return sInstance;
 	}
 
 	Animator::Animator()
