@@ -101,9 +101,7 @@ namespace GameEntity
 		std::shared_ptr<DX::GamePadComponent> mGamePad;		
 
 		const float mOrthoWidth;
-		const float mOrthoHeight;
-		
-		std::shared_ptr<Animation::Animator> mAnimator;
+		const float mOrthoHeight;				
 				
 		//Player specific
 		float mPosX;
@@ -165,9 +163,7 @@ namespace GameEntity
 
 		/******************* Player Constants ******************************/
 		static const float sPLAYER_1_INITIAL_POS_X;
-		static const float sPLAYER_1_INITIAL_POS_Y;
-		static const float sPLAYER_HEIGHT;
-		static const float sPLAYER_WIDTH;
+		static const float sPLAYER_1_INITIAL_POS_Y;		
 		static const float sPLAYER_X_VELOCITY;
 		static const float sPLAYER_X_JUMP_VELOCITY;
 		static const float sPLAYER_X_JUMP_QUANTUM_VELOCITY;
@@ -205,8 +201,10 @@ namespace GameEntity
 		static const float sWIDTH;
 		static const float sHEIGHT;
 		static const float sHALFWIDTH;
+
 		static const DirectX::XMFLOAT2 sPLAYER_SPRITE_SCALE;
 		static const DirectX::XMFLOAT2 sPLAYER_LIVES_SPRITE_SCALE;
+		static const DirectX::XMFLOAT2 sPLAYER_PADDLE_SPRITE_SCALE;
 		/*******************************************************************/
 	};
 }

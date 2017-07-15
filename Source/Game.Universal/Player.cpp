@@ -1,12 +1,18 @@
 #include "pch.h"
 #include "Player.h"
 #include "Animator.h"
+#include "TextManager.h"
+#include "StateManager.h"
+#include "BaseGameState.h"
 
 using namespace std;
 using namespace DX;
 using namespace DirectX;
 using namespace Windows::UI::Core;
 using namespace Animation;
+using namespace Managers;
+using namespace GameStates;
+using namespace Audio;
 
 namespace GameEntity
 {
@@ -49,21 +55,21 @@ namespace GameEntity
 
 	const float	Player::sWIDTH(33.0f);
 	const float	Player::sHEIGHT(45.0f);
-
 	const float	Player::sHALFWIDTH(sWIDTH / 2.0f);
 
 	const XMFLOAT2 Player::sPLAYER_SPRITE_SCALE(sWIDTH, sHEIGHT);
 	const XMFLOAT2 Player::sPLAYER_LIVES_SPRITE_SCALE(sPLAYER_LIVES_WIDTH, sPLAYER_LIVES_HEIGHT);
+	const XMFLOAT2 Player::sPLAYER_PADDLE_SPRITE_SCALE(sPADDLE_WIDTH, sPADDLE_HEIGHT);
 	/******************************************************************/
 
 	Player::Player(const shared_ptr<DX::DeviceResources>& deviceResources, const shared_ptr<Camera>& camera, const shared_ptr<KeyboardComponent>& keyboard, const shared_ptr<GamePadComponent>& gamePad)
 		:DrawableGameComponent(deviceResources, camera), mKeyboard(keyboard), mGamePad(gamePad), mLoadingComplete(false), mIndexCount(0),
 		mTextureTransform(MatrixHelper::Identity), CurrentPlayerState(nullptr), mOrthoWidth(OrthographicCamera::DefaultViewWidth),
-		mOrthoHeight(OrthographicCamera::DefaultViewHeight), mAnimator(Animator::GetInstance())
+		mOrthoHeight(OrthographicCamera::DefaultViewHeight)
 	{
-		mCurrentAnimation = &mAnimator->mMarioIdle;
-		mLivesAnimation = &mAnimator->mMarioLives;
-		mPaddleAnimation = &mAnimator->mPaddle;
+		mCurrentAnimation = &Animator::GetInstance()->mMarioIdle;
+		mLivesAnimation = &Animator::GetInstance()->mMarioLives;
+		mPaddleAnimation = &Animator::GetInstance()->mPaddle;
 		ResetPlayer();
 	}
 
@@ -242,7 +248,7 @@ namespace GameEntity
 
 	void Player::CollidedWithFloor(float newPlayerYPosition)
 	{
-		if ((mIsMovingRight && mKeyboard->IsKeyDown(Keys::Right)) || (!mIsMovingRight && mKeyboard->IsKeyDown(Keys::Left)))
+		if ((mIsMovingRight && (mKeyboard->IsKeyDown(Keys::Right) || mGamePad->IsButtonDown(GamePadButtons::DPadRight))) || (!mIsMovingRight && (mKeyboard->IsKeyDown(Keys::Left) || mGamePad->IsButtonDown(GamePadButtons::DPadLeft))))
 		{
 			ChangeState(PlayerState::ONGROUND);
 		}
@@ -270,7 +276,7 @@ namespace GameEntity
 			mLivesLeft--;
 
 			ChangeState(PlayerState::DEAD);
-			//SoundManager::GetInstance()->PlayHurtSound();
+			SoundManager::GetInstance()->PlayHurtSound();
 		}
 #endif
 	}
@@ -387,8 +393,10 @@ namespace GameEntity
 
 	void Player::RenderPlayerScore(const StepTimer& timer)
 	{
-		//TODO
+		//Unreferenced parameter
 		timer;
+
+		TextManager::GetInstance()->DisplayPlayerScore(mPlayerScore);
 	}
 
 	void Player::RenderPlayerSprites(const StepTimer& timer)
@@ -447,6 +455,20 @@ namespace GameEntity
 	{
 		//TODO
 		timer;
+
+		float paddlePosX = mPosX;
+		float paddlePosY = mPosY - (sHEIGHT - 1);
+
+		float xTextureCoord = mPaddleAnimation->mDimensions[mPaddleSpriteIndex].mPosX / mPaddleAnimation->mSpriteWidth;
+		float yTextureCoord = mPaddleAnimation->mDimensions[mPaddleSpriteIndex].mPosY / mPaddleAnimation->mSpriteHeight;
+		float textureCoordWidth = (mPaddleAnimation->mDimensions[mPaddleSpriteIndex].mPosX + mPaddleAnimation->mDimensions[mPaddleSpriteIndex].mWidth) / mPaddleAnimation->mSpriteWidth;
+		float textureCoordHeight = (mPaddleAnimation->mDimensions[mPaddleSpriteIndex].mPosY + mPaddleAnimation->mDimensions[mPaddleSpriteIndex].mHeight) / mPaddleAnimation->mSpriteHeight;
+
+		SetupVertices(xTextureCoord, yTextureCoord, textureCoordWidth, textureCoordHeight);
+
+		BindBuffers();
+
+		DrawIndividualSprite(paddlePosX, paddlePosY, sPLAYER_PADDLE_SPRITE_SCALE);
 	}
 
 	void Player::ResetPlayerSprites()
@@ -475,7 +497,7 @@ namespace GameEntity
 		case PlayerState::ONGROUND:
 			if (isChangeSprite)
 			{
-				mCurrentAnimation = &mAnimator->mMarioIdle;
+				mCurrentAnimation = &Animator::GetInstance()->mMarioIdle;
 			}
 
 			mXVelocity = 0;
@@ -487,7 +509,7 @@ namespace GameEntity
 		case PlayerState::RUNNING:
 			if (isChangeSprite)
 			{
-				mCurrentAnimation = &mAnimator->mMarioRunning;
+				mCurrentAnimation = &Animator::GetInstance()->mMarioRunning;
 			}
 
 			CurrentPlayerState = bind(&Player::PlayerRunning, this, std::placeholders::_1);
@@ -497,7 +519,7 @@ namespace GameEntity
 		case PlayerState::RUNJUMPING:
 			if (isChangeSprite)
 			{
-				mCurrentAnimation = &mAnimator->mMarioJump;
+				mCurrentAnimation = &Animator::GetInstance()->mMarioJump;
 			}
 
 			mYVelocity = sPLAYER_Y_VELOCITY;
@@ -509,7 +531,7 @@ namespace GameEntity
 		case PlayerState::SLIPPING:
 			if (isChangeSprite)
 			{
-				mCurrentAnimation = &mAnimator->mMarioSlip;
+				mCurrentAnimation = &Animator::GetInstance()->mMarioSlip;
 			}
 
 			ResetPlayerSprites();
@@ -520,7 +542,7 @@ namespace GameEntity
 		case PlayerState::FALLING:
 			if (isChangeSprite)
 			{
-				mCurrentAnimation = &mAnimator->mMarioRunning;
+				mCurrentAnimation = &Animator::GetInstance()->mMarioRunning;
 			}
 
 			if (mGravity == 0)
@@ -534,7 +556,7 @@ namespace GameEntity
 		case PlayerState::SLIPFALLING:
 			if (isChangeSprite)
 			{
-				mCurrentAnimation = &mAnimator->mMarioSlip;
+				mCurrentAnimation = &Animator::GetInstance()->mMarioSlip;
 			}
 
 			if (mGravity == 0)
@@ -567,7 +589,7 @@ namespace GameEntity
 		case PlayerState::DEAD:
 			if (isChangeSprite)
 			{
-				mCurrentAnimation = &mAnimator->mMarioDeath;
+				mCurrentAnimation = &Animator::GetInstance()->mMarioDeath;
 			}
 
 			mSlipDuration = 0;
@@ -590,7 +612,7 @@ namespace GameEntity
 		case PlayerState::RESPAWNING:
 			if (isChangeSprite)
 			{
-				mCurrentAnimation = &mAnimator->mMarioIdle;
+				mCurrentAnimation = &Animator::GetInstance()->mMarioIdle;
 			}
 
 			mXVelocity = 0;
@@ -618,20 +640,19 @@ namespace GameEntity
 	/******************* Player States ********************************/
 	void Player::PlayerOnGround(const StepTimer& timer)
 	{
-		timer;
-		//TODO Add gamepad support
-		if (mKeyboard->IsKeyDown(Keys::Space))
+		timer;		
+		if (mKeyboard->WasKeyPressedThisFrame(Keys::Space) || mGamePad->IsButtonDown(GamePadButtons::A))
 		{
 			ChangeState(PlayerState::STRAIGHTJUMPING);
-			//SoundManager::GetInstance()->PlayPlayerJumpSound();
+			SoundManager::GetInstance()->PlayPlayerJumpSound();
 		}
-		else if (mKeyboard->IsKeyDown(Keys::Right))
+		else if (mKeyboard->IsKeyDown(Keys::Right) || mGamePad->IsButtonDown(GamePadButtons::DPadRight))
 		{
 			mXVelocity = sPLAYER_X_VELOCITY;
 			mIsMovingRight = true;
 			ChangeState(PlayerState::RUNNING);
 		}
-		else if (mKeyboard->IsKeyDown(Keys::Left))
+		else if (mKeyboard->IsKeyDown(Keys::Left) || mGamePad->IsButtonDown(GamePadButtons::DPadLeft))
 		{
 			mXVelocity = -sPLAYER_X_VELOCITY;
 			mIsMovingRight = false;
@@ -640,16 +661,15 @@ namespace GameEntity
 	}
 
 	void Player::PlayerRunning(const StepTimer& timer)
-	{
-		//TODO Add gamepad support
-		if (mKeyboard->WasKeyPressedThisFrame(Keys::Space))
+	{		
+		if (mKeyboard->WasKeyPressedThisFrame(Keys::Space) || mGamePad->IsButtonDown(GamePadButtons::A))
 		{
 			mSlipDuration = sSLIP_DURATION_CAP;
 			ResetPlayerSprites();
 			ChangeState(PlayerState::RUNJUMPING);
-			//SoundManager::GetInstance()->PlayPlayerJumpSound();
+			SoundManager::GetInstance()->PlayPlayerJumpSound();
 		}
-		else if (mKeyboard->IsKeyDown(Keys::Right))
+		else if (mKeyboard->IsKeyDown(Keys::Right) || mGamePad->IsButtonDown(GamePadButtons::DPadRight))
 		{
 			if (!mIsMovingRight)
 			{
@@ -662,7 +682,7 @@ namespace GameEntity
 				mIsMovingRight = true;
 			}
 		}
-		else if (mKeyboard->IsKeyDown(Keys::Left))
+		else if (mKeyboard->IsKeyDown(Keys::Left) || mGamePad->IsButtonDown(GamePadButtons::DPadLeft))
 		{
 			if (mIsMovingRight)
 			{
@@ -683,15 +703,14 @@ namespace GameEntity
 
 	void Player::PlayerJumping(const StepTimer& timer)
 	{
-		timer;
-		//TODO Add gamepad support
-		if (mKeyboard->IsKeyDown(Keys::Right))
+		timer;		
+		if (mKeyboard->IsKeyDown(Keys::Right) || mGamePad->IsButtonDown(GamePadButtons::DPadRight))
 		{
 			mXVelocity = sPLAYER_X_JUMP_VELOCITY;
 			mPosX += sPLAYER_X_JUMP_QUANTUM_VELOCITY * static_cast<float>(timer.GetElapsedSeconds());
 			mIsMovingRight = true;
 		}
-		else if (mKeyboard->IsKeyDown(Keys::Left))
+		else if (mKeyboard->IsKeyDown(Keys::Left) || mGamePad->IsButtonDown(GamePadButtons::DPadLeft))
 		{
 			mXVelocity = -sPLAYER_X_JUMP_VELOCITY;
 			mPosX -= sPLAYER_X_JUMP_QUANTUM_VELOCITY * static_cast<float>(timer.GetElapsedSeconds());
@@ -700,16 +719,15 @@ namespace GameEntity
 	}
 
 	void Player::PlayerSlipping(const StepTimer& timer)
-	{
-		//TODO Add gamepad support
+	{		
 		if (mSlipDuration > 0)
 		{
 			mSlipDuration -= timer.GetElapsedMilliSeconds();
 
-			if (mKeyboard->WasKeyPressedThisFrame(Keys::Space))
+			if (mKeyboard->WasKeyPressedThisFrame(Keys::Space) || mGamePad->IsButtonDown(GamePadButtons::A))
 			{
 				ChangeState(PlayerState::STRAIGHTJUMPING);
-				//SoundManager::GetInstance()->PlayPlayerJumpSound();
+				SoundManager::GetInstance()->PlayPlayerJumpSound();
 				mXVelocity = 0;
 				mSlipDuration = 0;
 			}
@@ -741,7 +759,7 @@ namespace GameEntity
 			ChangeState(PlayerState::DEADJUMPING);
 
 			mDeathDuration = 0;
-			//SoundManager::GetInstance()->PlayDeathSound();
+			SoundManager::GetInstance()->PlayDeathSound();
 		}
 	}
 
@@ -751,22 +769,20 @@ namespace GameEntity
 		if (mPosY < 0)
 		{
 			if (mLivesLeft == 0)
-			{
-				//TODO Implement game over state
-				//StateManager::GetInstance()->ChangeState(GameState::GAME_OVER);
+			{				
+				StateManager::GetInstance()->ChangeState(GameState::GAME_OVER);
 			}
 			else
 			{
 				ChangeState(PlayerState::RESPAWNING);
 				mIsMovingRight = false;
-				//SoundManager::GetInstance()->PlayPlayerSpawnSound();
+				SoundManager::GetInstance()->PlayPlayerSpawnSound();
 			}
 		}
 	}
 
 	void Player::PlayerReSpawning(const StepTimer& timer)
-	{
-		//TODO Add gamepad support
+	{		
 		mReSpawnDuration += timer.GetElapsedMilliSeconds();
 		if (mPosY < sPLAYER_RESPAWN_STOP_POS_Y)
 		{
@@ -774,20 +790,20 @@ namespace GameEntity
 			mYVelocity = 0;
 			mPosY = sPLAYER_RESPAWN_STOP_POS_Y - 1;
 
-			if (mKeyboard->WasKeyPressedThisFrame(Keys::Space))
+			if (mKeyboard->WasKeyPressedThisFrame(Keys::Space) || mGamePad->IsButtonDown(GamePadButtons::A))
 			{
 				ChangeState(PlayerState::STRAIGHTJUMPING);
 				ResetPaddleSprites();
-				//SoundManager::GetInstance()->PlayPlayerJumpSound();
+				SoundManager::GetInstance()->PlayPlayerJumpSound();
 			}
-			else if (mKeyboard->IsKeyDown(Keys::Right))
+			else if (mKeyboard->IsKeyDown(Keys::Right) || mGamePad->IsButtonDown(GamePadButtons::DPadRight))
 			{
 				mXVelocity = sPLAYER_X_VELOCITY;
 				mIsMovingRight = true;
 				ChangeState(PlayerState::RUNNING);
 				ResetPaddleSprites();
 			}
-			else if (mKeyboard->IsKeyDown(Keys::Left))
+			else if (mKeyboard->IsKeyDown(Keys::Left) || mGamePad->IsButtonDown(GamePadButtons::DPadLeft))
 			{
 				mXVelocity = -sPLAYER_X_VELOCITY;
 				mIsMovingRight = false;
