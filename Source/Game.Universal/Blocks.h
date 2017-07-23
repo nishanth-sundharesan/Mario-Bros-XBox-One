@@ -2,6 +2,8 @@
 #include "DrawableGameComponent.h"
 #include "VertexDeclarations.h"
 #include "Animator.h"
+#include "ShapeHelper.h"
+#include "SquareShape.h"
 
 namespace Managers
 {
@@ -21,8 +23,9 @@ namespace GameEntity
 		TOPRIGHTBLOCK
 	};
 
-	class Blocks : public DX::DrawableGameComponent
+	class Blocks final: public DX::DrawableGameComponent
 	{
+		friend class Managers::PhysicsManager;
 	public:
 		Blocks(const std::shared_ptr<DX::DeviceResources>& deviceResources, const std::shared_ptr<DX::Camera>& camera);
 		Blocks(const Blocks&) = delete;
@@ -87,7 +90,10 @@ namespace GameEntity
 		DX::VertexPositionTexture mVertices[4];
 		std::shared_ptr<Animation::Animator> mAnimator;
 
-		//Blocks specific		
+		//Blocks specific
+		std::shared_ptr<Core::ShapeHelper> mShapeHelper;
+		std::unique_ptr<SquareShape> mSquareShape;
+
 		bool mRenderFlexibleBlocks;		
 
 		float mSpriteSpeed;
@@ -103,11 +109,13 @@ namespace GameEntity
 		bool mIsLastBlockAttacked;
 		bool mIsFirstBlockAttacked;
 
-		void ResetFlexibleBlocks();
-		void ClearStaticBlocks();
-		void UpdateFlexibleBlockSpriteData(const DX::StepTimer& timer, const Animation::Sprites& currentFlexibleBlock);
+		void RenderBlocks(const DX::StepTimer& timer);
 		void RenderFlexibleBlocks(const DX::StepTimer& timer);
 
+		void ResetFlexibleBlocks();
+		void ClearStaticBlocks(const DX::StepTimer& timer);
+		void UpdateFlexibleBlockSpriteData(const DX::StepTimer& timer, const Animation::Sprites& currentFlexibleBlock);
+		
 		/******************* Blocks Constants ******************************/
 		static const float sBLOCK_WIDTH;
 		static const float sBLOCK_HEIGHT;

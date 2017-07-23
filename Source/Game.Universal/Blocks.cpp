@@ -8,6 +8,7 @@ using namespace DirectX;
 using namespace Windows::UI::Core;
 using namespace Animation;
 using namespace Managers;
+using namespace Core;
 
 namespace GameEntity
 {
@@ -38,8 +39,10 @@ namespace GameEntity
 	Blocks::Blocks(const shared_ptr<DX::DeviceResources>& deviceResources, const shared_ptr<Camera>& camera)
 		:DrawableGameComponent(deviceResources, camera), mLoadingComplete(false), mIndexCount(0),
 		mTextureTransform(MatrixHelper::Identity), mOrthoWidth(OrthographicCamera::DefaultViewWidth),
-		mOrthoHeight(OrthographicCamera::DefaultViewHeight), mAnimator(Animator::GetInstance())
+		mOrthoHeight(OrthographicCamera::DefaultViewHeight), mAnimator(Animator::GetInstance()),
+		mSquareShape(make_unique<SquareShape>(deviceResources, camera)), mShapeHelper(make_shared<ShapeHelper>(XMFLOAT2(0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT4(&DirectX::Colors::Black[0])))
 	{
+		mSquareShape->SetActiveShapeHelper(mShapeHelper);
 		ResetFlexibleBlocks();
 	}
 
@@ -126,6 +129,8 @@ namespace GameEntity
 		loadSpriteSheetAndCreateSpritesTask.then([this]() {
 			mLoadingComplete = true;
 		});
+
+		mSquareShape->CreateDeviceDependentResources();
 	}
 
 	void Blocks::ReleaseDeviceDependentResources()
@@ -139,6 +144,8 @@ namespace GameEntity
 		mVSCBufferPerObject.Reset();
 		mSpriteSheet.Reset();
 		mTextureSampler.Reset();
+
+		mSquareShape->ReleaseDeviceDependentResources();
 	}
 
 	void Blocks::Render(const StepTimer& timer)
@@ -147,84 +154,10 @@ namespace GameEntity
 		if (!mLoadingComplete)
 		{
 			return;
-		}		
-
-		SetupVertices(mStaticBlockCoordinates.mXTextureCoord, mStaticBlockCoordinates.mYTextureCoord, mStaticBlockCoordinates.mTextureCoordWidth, mStaticBlockCoordinates.mTextureCoordHeight);
-		BindBuffers();			
-
-		//Drawing sprites
-		/*********************************Displaying Bottom Blocks**************************************/
-		float xPosition = 0;		
-		float yPosition = sBOTTOM_BLOCKS_POS_Y;
-		
-		for (int i = 0; i < sNUMBER_OF_BOTTOM_BLOCKS; i++)
-		{			
-			DrawIndividualSprite(xPosition, yPosition, sBLOCK_SPRITE_SCALE);
-			xPosition += sBLOCK_WIDTH;			
 		}
 
-		xPosition = mOrthoWidth - (sBLOCK_WIDTH * sNUMBER_OF_BOTTOM_BLOCKS) + 1;									//Adding a hard-coded value 1 for the first texture to display properly
-
-		for (int i = 0; i < sNUMBER_OF_BOTTOM_BLOCKS; i++)
-		{			
-			DrawIndividualSprite(xPosition, yPosition, sBLOCK_SPRITE_SCALE);
-			xPosition += sBLOCK_WIDTH;			
-		}
-		/***********************************************************************************************/
-
-		/**************************Displaying Middle Left & Right Blocks********************************/
-		xPosition = 0;
-		yPosition = sMIDDLE_LEFT_BLOCKS_POS_Y;		
-
-		for (int i = 0; i < sNUMBER_OF_MIDDLE_LEFT_BLOCKS; i++)
-		{			
-			DrawIndividualSprite(xPosition, yPosition, sBLOCK_SPRITE_SCALE);
-			xPosition += sBLOCK_WIDTH;
-		}
-
-		xPosition = mOrthoWidth - (sBLOCK_WIDTH * sNUMBER_OF_MIDDLE_LEFT_BLOCKS) + 1;								//Adding a hard-coded value 1 for the first texture to display properly
-
-		for (int i = 0; i < sNUMBER_OF_MIDDLE_LEFT_BLOCKS; i++)
-		{
-			DrawIndividualSprite(xPosition, yPosition, sBLOCK_SPRITE_SCALE);
-			xPosition += sBLOCK_WIDTH;			
-		}
-		/***********************************************************************************************/
-
-		/******************************Displaying Middle Blocks*****************************************/
-		xPosition = sMIDDLE_BLOCKS_POS_X;
-		yPosition = sMIDDLE_BLOCKS_POS_Y;
-
-		for (int i = 0; i < sNUMBER_OF_MIDDLE_BLOCKS; i++)
-		{
-			DrawIndividualSprite(xPosition, yPosition, sBLOCK_SPRITE_SCALE);
-			xPosition += sBLOCK_WIDTH;
-		}
-		/***********************************************************************************************/
-
-		/********************************Displaying Top Blocks******************************************/
-		xPosition = 0;
-		yPosition = sTOP_BLOCKS_POS_Y;
-
-		for (int i = 0; i < sNUMBER_OF_TOP_BLOCKS; i++)
-		{
-			DrawIndividualSprite(xPosition, yPosition, sBLOCK_SPRITE_SCALE);
-			xPosition += sBLOCK_WIDTH;
-		}
-
-		xPosition = mOrthoWidth - (sBLOCK_WIDTH * sNUMBER_OF_TOP_BLOCKS);
-
-		for (int i = 0; i < sNUMBER_OF_TOP_BLOCKS; i++)
-		{
-			DrawIndividualSprite(xPosition, yPosition, sBLOCK_SPRITE_SCALE);
-			xPosition += sBLOCK_WIDTH;
-		}
-		/***********************************************************************************************/
-
-		if (mRenderFlexibleBlocks)
-		{
-			RenderFlexibleBlocks(timer);
-		}
+		RenderBlocks(timer);
+		RenderFlexibleBlocks(timer);
 	}
 
 	void Blocks::Init(PhysicsManager& physicsManager)
@@ -331,7 +264,7 @@ namespace GameEntity
 			mFlexibleSpritePositionBottom = mFlexibleSpritePositionTop - sBLOCK_HEIGHT;
 			mRenderFlexibleBlocks = true;
 		}
-	}	
+	}
 
 	void Blocks::InitiazeIndexes()
 	{
@@ -357,10 +290,10 @@ namespace GameEntity
 	void Blocks::SetupVertices(float xTextureCoord, float yTextureCoord, float textureCoordWidth, float textureCoordHeight)
 	{
 		//Top left pivot - right faced
-		mVertices[0] = VertexPositionTexture(XMFLOAT4(0.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, textureCoordHeight));				//Bottom left
-		mVertices[1] = VertexPositionTexture(XMFLOAT4(0.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, yTextureCoord));						//Top left
-		mVertices[2] = VertexPositionTexture(XMFLOAT4(1.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, yTextureCoord));							//Top right
-		mVertices[3] = VertexPositionTexture(XMFLOAT4(1.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, textureCoordHeight));					//Bottom right
+		mVertices[0] = VertexPositionTexture(XMFLOAT4(0.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, textureCoordHeight));				//Bottom left
+		mVertices[1] = VertexPositionTexture(XMFLOAT4(0.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(xTextureCoord, yTextureCoord));						//Top left
+		mVertices[2] = VertexPositionTexture(XMFLOAT4(1.0f, 0.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, yTextureCoord));							//Top right
+		mVertices[3] = VertexPositionTexture(XMFLOAT4(1.0f, -1.0f, 0.1f, 1.0f), XMFLOAT2(textureCoordWidth, textureCoordHeight));					//Bottom right
 
 		D3D11_BUFFER_DESC vertexBufferDesc = { 0 };
 		vertexBufferDesc.ByteWidth = sizeof(VertexPositionTexture) * ARRAYSIZE(mVertices);
@@ -416,13 +349,16 @@ namespace GameEntity
 		mRenderFlexibleBlocks = false;
 	}
 
-	void Blocks::ClearStaticBlocks()
+	void Blocks::ClearStaticBlocks(const StepTimer& timer)
 	{
-		//TODO
+		mShapeHelper->SetPosition(XMFLOAT2(mFlexibleSpritePositionLeft, mFlexibleSpritePositionTop));
+		mShapeHelper->SetSize(XMFLOAT2(abs(mFlexibleSpritePositionLeft - mFlexibleSpritePositionRight), abs((mFlexibleSpritePositionTop) - mFlexibleSpritePositionBottom)));
+		
+		mSquareShape->Render(timer);
 	}
 
 	void Blocks::UpdateFlexibleBlockSpriteData(const StepTimer& timer, const Sprites& currentFlexibleBlock)
-	{		
+	{
 		mSpriteSpeed += timer.GetElapsedMilliSeconds();
 		if (mSpriteSpeed > sFLEXIBLE_BLOCKS_SPEED)
 		{
@@ -436,21 +372,100 @@ namespace GameEntity
 		}
 	}
 
+	void Blocks::RenderBlocks(const StepTimer& timer)
+	{
+		timer;
+
+		SetupVertices(mStaticBlockCoordinates.mXTextureCoord, mStaticBlockCoordinates.mYTextureCoord, mStaticBlockCoordinates.mTextureCoordWidth, mStaticBlockCoordinates.mTextureCoordHeight);
+		BindBuffers();
+
+		//Drawing sprites
+		/*********************************Displaying Bottom Blocks**************************************/
+		float xPosition = 0;
+		float yPosition = sBOTTOM_BLOCKS_POS_Y;
+
+		for (int i = 0; i < sNUMBER_OF_BOTTOM_BLOCKS; i++)
+		{
+			DrawIndividualSprite(xPosition, yPosition, sBLOCK_SPRITE_SCALE);
+			xPosition += sBLOCK_WIDTH;
+		}
+
+		xPosition = mOrthoWidth - (sBLOCK_WIDTH * sNUMBER_OF_BOTTOM_BLOCKS) + 1;									//Adding a hard-coded value 1 for the first texture to display properly
+
+		for (int i = 0; i < sNUMBER_OF_BOTTOM_BLOCKS; i++)
+		{
+			DrawIndividualSprite(xPosition, yPosition, sBLOCK_SPRITE_SCALE);
+			xPosition += sBLOCK_WIDTH;
+		}
+		/***********************************************************************************************/
+
+		/**************************Displaying Middle Left & Right Blocks********************************/
+		xPosition = 0;
+		yPosition = sMIDDLE_LEFT_BLOCKS_POS_Y;
+
+		for (int i = 0; i < sNUMBER_OF_MIDDLE_LEFT_BLOCKS; i++)
+		{
+			DrawIndividualSprite(xPosition, yPosition, sBLOCK_SPRITE_SCALE);
+			xPosition += sBLOCK_WIDTH;
+		}
+
+		xPosition = mOrthoWidth - (sBLOCK_WIDTH * sNUMBER_OF_MIDDLE_LEFT_BLOCKS) + 1;								//Adding a hard-coded value 1 for the first texture to display properly
+
+		for (int i = 0; i < sNUMBER_OF_MIDDLE_LEFT_BLOCKS; i++)
+		{
+			DrawIndividualSprite(xPosition, yPosition, sBLOCK_SPRITE_SCALE);
+			xPosition += sBLOCK_WIDTH;
+		}
+		/***********************************************************************************************/
+
+		/******************************Displaying Middle Blocks*****************************************/
+		xPosition = sMIDDLE_BLOCKS_POS_X;
+		yPosition = sMIDDLE_BLOCKS_POS_Y;
+
+		for (int i = 0; i < sNUMBER_OF_MIDDLE_BLOCKS; i++)
+		{
+			DrawIndividualSprite(xPosition, yPosition, sBLOCK_SPRITE_SCALE);
+			xPosition += sBLOCK_WIDTH;
+		}
+		/***********************************************************************************************/
+
+		/********************************Displaying Top Blocks******************************************/
+		xPosition = 0;
+		yPosition = sTOP_BLOCKS_POS_Y;
+
+		for (int i = 0; i < sNUMBER_OF_TOP_BLOCKS; i++)
+		{
+			DrawIndividualSprite(xPosition, yPosition, sBLOCK_SPRITE_SCALE);
+			xPosition += sBLOCK_WIDTH;
+		}
+
+		xPosition = mOrthoWidth - (sBLOCK_WIDTH * sNUMBER_OF_TOP_BLOCKS);
+
+		for (int i = 0; i < sNUMBER_OF_TOP_BLOCKS; i++)
+		{
+			DrawIndividualSprite(xPosition, yPosition, sBLOCK_SPRITE_SCALE);
+			xPosition += sBLOCK_WIDTH;
+		}
+		/***********************************************************************************************/
+	}
+
 	void Blocks::RenderFlexibleBlocks(const StepTimer& timer)
 	{
-		//TODO test this
-		ClearStaticBlocks();
+		if (mRenderFlexibleBlocks)
+		{			
+			ClearStaticBlocks(timer);
 
-		const Sprites& currentFlexibleBlock = mAnimator->GetCurrentStageFlexibleBlock();					//Currently blue blocks are displayed in all levels
-		UpdateFlexibleBlockSpriteData(timer, currentFlexibleBlock);
+			const Sprites& currentFlexibleBlock = mAnimator->GetCurrentStageFlexibleBlock();					//Currently blue blocks are displayed in all levels
+			UpdateFlexibleBlockSpriteData(timer, currentFlexibleBlock);
 
-		float xTextureCoord = (currentFlexibleBlock.mDimensions[mSpriteIndex].mPosX + (mIsFirstBlockAttacked ? (currentFlexibleBlock.mDimensions[mSpriteIndex].mWidth / sTOTAL_FLEXIBLE_BLOCKS) : 0)) / currentFlexibleBlock.mSpriteWidth;
-		float yTextureCoord = currentFlexibleBlock.mDimensions[mSpriteIndex].mPosY / currentFlexibleBlock.mSpriteHeight;
-		float textureCoordWidth = (currentFlexibleBlock.mDimensions[mSpriteIndex].mPosX + (currentFlexibleBlock.mDimensions[mSpriteIndex].mWidth - (mIsLastBlockAttacked ? currentFlexibleBlock.mDimensions[mSpriteIndex].mWidth / sTOTAL_FLEXIBLE_BLOCKS : 0))) / currentFlexibleBlock.mSpriteWidth;
-		float textureCoordHeight = (currentFlexibleBlock.mDimensions[mSpriteIndex].mPosY + currentFlexibleBlock.mDimensions[mSpriteIndex].mHeight) / currentFlexibleBlock.mSpriteHeight;
+			float xTextureCoord = (currentFlexibleBlock.mDimensions[mSpriteIndex].mPosX + (mIsFirstBlockAttacked ? (currentFlexibleBlock.mDimensions[mSpriteIndex].mWidth / sTOTAL_FLEXIBLE_BLOCKS) : 0)) / currentFlexibleBlock.mSpriteWidth;
+			float yTextureCoord = currentFlexibleBlock.mDimensions[mSpriteIndex].mPosY / currentFlexibleBlock.mSpriteHeight;
+			float textureCoordWidth = (currentFlexibleBlock.mDimensions[mSpriteIndex].mPosX + (currentFlexibleBlock.mDimensions[mSpriteIndex].mWidth - (mIsLastBlockAttacked ? currentFlexibleBlock.mDimensions[mSpriteIndex].mWidth / sTOTAL_FLEXIBLE_BLOCKS : 0))) / currentFlexibleBlock.mSpriteWidth;
+			float textureCoordHeight = (currentFlexibleBlock.mDimensions[mSpriteIndex].mPosY + currentFlexibleBlock.mDimensions[mSpriteIndex].mHeight) / currentFlexibleBlock.mSpriteHeight;
 
-		SetupVertices(xTextureCoord, yTextureCoord, textureCoordWidth, textureCoordHeight);	
-		BindBuffers();
-		DrawIndividualSprite(mFlexibleSpritePositionLeft, mFlexibleSpritePositionTop, XMFLOAT2(abs(mFlexibleSpritePositionLeft - mFlexibleSpritePositionRight), abs((mFlexibleSpritePositionTop + sBLOCK_HEIGHT) - mFlexibleSpritePositionBottom)));
+			SetupVertices(xTextureCoord, yTextureCoord, textureCoordWidth, textureCoordHeight);
+			BindBuffers();
+			DrawIndividualSprite(mFlexibleSpritePositionLeft, mFlexibleSpritePositionTop + sBLOCK_HEIGHT, XMFLOAT2(abs(mFlexibleSpritePositionLeft - mFlexibleSpritePositionRight), abs((mFlexibleSpritePositionTop + sBLOCK_HEIGHT) - mFlexibleSpritePositionBottom)));
+		}
 	}
 }
