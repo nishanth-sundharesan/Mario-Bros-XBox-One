@@ -32,6 +32,19 @@ namespace DX
 		static const D3D11_INPUT_ELEMENT_DESC InputElements[InputElementCount];
 	};
 
+	struct TextureCoordinates
+	{		
+		TextureCoordinates() = default;
+
+		TextureCoordinates(float xTextureCoord, float yTextureCoord, float textureCoordWidth, float textureCoordHeight) :
+			mXTextureCoord(xTextureCoord), mYTextureCoord(yTextureCoord), mTextureCoordWidth(textureCoordWidth), mTextureCoordHeight(textureCoordHeight) { }
+
+		float mXTextureCoord;
+		float mYTextureCoord;
+		float mTextureCoordWidth;
+		float mTextureCoordHeight;
+	};
+
 	struct VertexPositionTexture
 	{
 		VertexPositionTexture() = default;
