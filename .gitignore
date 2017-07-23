@@ -7,3 +7,4 @@ Build/packages/
 Build/DirectX.Framework.VC.db
 Build/ipch/
 Build/DirectX.Framework.VC.VC.opendb
+Source/Library.Windows/Library.Windows.vcxproj.user
