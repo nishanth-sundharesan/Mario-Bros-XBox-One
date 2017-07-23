@@ -36,6 +36,7 @@ namespace DX
 		// Get elapsed time since the previous Update call.
 		uint64 GetElapsedTicks() const						{ return m_elapsedTicks; }
 		double GetElapsedSeconds() const					{ return TicksToSeconds(m_elapsedTicks); }
+		uint32 GetElapsedMilliSeconds() const				{ return static_cast<uint32>(m_elapsedTicks / 10000); }
 
 		// Get total time since the start of the program.
 		uint64 GetTotalTicks() const						{ return m_totalTicks; }
