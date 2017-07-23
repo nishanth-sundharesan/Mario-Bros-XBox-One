@@ -54,7 +54,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -74,7 +74,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -125,10 +125,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
@@ -139,13 +143,17 @@
     <ClCompile>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\source\Library.Windows;$(SolutionDir)..\source\Library.Shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\source\Library.Windows;$(SolutionDir)..\source\Library.Shared;$(SolutionDir)..\External\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj /Zm200 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <Link>
@@ -156,13 +164,17 @@
     <ClCompile>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\source\Library.Windows;$(SolutionDir)..\source\Library.Shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\source\Library.Windows;$(SolutionDir)..\source\Library.Shared;$(SolutionDir)..\External\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj /Zm200 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Link>
@@ -173,13 +185,17 @@
     <ClCompile>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\source\Library.Windows;$(SolutionDir)..\source\Library.Shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\source\Library.Windows;$(SolutionDir)..\source\Library.Shared;$(SolutionDir)..\External\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj /Zm200 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Link>
@@ -190,13 +206,17 @@
     <ClCompile>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\source\Library.Windows;$(SolutionDir)..\source\Library.Shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\source\Library.Windows;$(SolutionDir)..\source\Library.Shared;$(SolutionDir)..\External\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj /Zm200 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
@@ -207,13 +227,21 @@
     <ClCompile>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\source\Library.Windows;$(SolutionDir)..\source\Library.Shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\source\Library.Windows;$(SolutionDir)..\source\Library.Shared;$(SolutionDir)..\External\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj /Zm200 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
@@ -224,13 +252,21 @@
     <ClCompile>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\source\Library.Windows;$(SolutionDir)..\source\Library.Shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\source\Library.Windows;$(SolutionDir)..\source\Library.Shared;$(SolutionDir)..\External\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj /Zm200 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Image Include="Assets\LockScreenLogo.scale-200.png" />
@@ -240,31 +276,56 @@
     <Image Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Image Include="Assets\StoreLogo.png" />
     <Image Include="Assets\Wide310x150Logo.scale-200.png" />
+    <Image Include="Content\Textures\Background.png" />
+    <Image Include="Content\Textures\Blocks.png" />
+    <Image Include="Content\Textures\Enemies.png" />
+    <Image Include="Content\Textures\Mario.png" />
     <Image Include="Content\Textures\snoods_default.png" />
+    <Image Include="Content\Textures\StartScreen.png" />
+    <Image Include="Content\Textures\Text.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animator.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="Background.h" />
-    <ClInclude Include="Ball.h" />
-    <ClInclude Include="BallManager.h" />
     <ClInclude Include="BaseGameState.h" />
-    <ClInclude Include="Field.h" />
-    <ClInclude Include="FieldManager.h" />
+    <ClInclude Include="Blocks.h" />
+    <ClInclude Include="Crab.h" />
+    <ClInclude Include="Duck.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyManager.h" />
     <ClInclude Include="GameMain.h" />
+    <ClInclude Include="GameOver.h" />
     <ClInclude Include="GamePlayState.h" />
+    <ClInclude Include="GameStart.h" />
+    <ClInclude Include="LevelManager.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="MoodySprite.h" />
-    <ClInclude Include="SpriteDemoManager.h" />
+    <ClInclude Include="PhysicsManager.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="SoundManager.h" />
+    <ClInclude Include="SquareShape.h" />
+    <ClInclude Include="ShapeHelper.h" />
+    <ClInclude Include="StateManager.h" />
+    <ClInclude Include="TextManager.h" />
+    <ClInclude Include="XmlParseHelper.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\External\Source\tinyxml2.cpp" />
+    <ClCompile Include="Animator.cpp" />
     <ClCompile Include="App.cpp" />
-    <ClCompile Include="Ball.cpp" />
-    <ClCompile Include="BallManager.cpp" />
     <ClCompile Include="BaseGameState.cpp" />
-    <ClCompile Include="Field.cpp" />
-    <ClCompile Include="FieldManager.cpp" />
+    <ClCompile Include="Blocks.cpp" />
+    <ClCompile Include="Crab.cpp" />
+    <ClCompile Include="Duck.cpp" />
+    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="EnemyManager.cpp" />
+    <ClCompile Include="Background.cpp" />
     <ClCompile Include="GameMain.cpp" />
+    <ClCompile Include="GameOver.cpp" />
     <ClCompile Include="GamePlayState.cpp" />
+    <ClCompile Include="GameStart.cpp" />
+    <ClCompile Include="LevelManager.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -273,8 +334,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="MoodySprite.cpp" />
-    <ClCompile Include="SpriteDemoManager.cpp" />
+    <ClCompile Include="PhysicsManager.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
+    <ClCompile Include="SquareShape.cpp" />
+    <ClCompile Include="ShapeHelper.cpp" />
+    <ClCompile Include="StateManager.cpp" />
+    <ClCompile Include="TextManager.cpp" />
+    <ClCompile Include="XmlParseHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -321,6 +388,38 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Game.Universal.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="Content\XmlFiles\MarioBrosLevels.xml">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Xml>
+    <Xml Include="Content\XmlFiles\MarioBrosSprite.xml">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Content\Sounds\Die.wav" />
+    <Media Include="Content\Sounds\EnemyFall.wav" />
+    <Media Include="Content\Sounds\EnemyKick.wav" />
+    <Media Include="Content\Sounds\FlipEnemy.wav" />
+    <Media Include="Content\Sounds\GameOver.wav" />
+    <Media Include="Content\Sounds\GameStart.wav" />
+    <Media Include="Content\Sounds\Hurt.wav" />
+    <Media Include="Content\Sounds\Jump.wav" />
+    <Media Include="Content\Sounds\MenuScreen.wav" />
+    <Media Include="Content\Sounds\PhaseEnd.wav" />
+    <Media Include="Content\Sounds\PhaseStart.wav" />
+    <Media Include="Content\Sounds\SpawnPlayer.wav" />
+    <Media Include="Content\Sounds\SpawnShellCreeper.wav" />
+    <Media Include="Content\Sounds\SpawnSideStepper.wav" />
+    <Media Include="Content\Sounds\Step1.wav" />
+    <Media Include="Content\Sounds\Step2.wav" />
+    <Media Include="Content\Sounds\Step3.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
