@@ -10,8 +10,8 @@ using namespace tinyxml2;
 namespace Core
 {
 	//TODO check xml files once
-	const string XmlParserHelper::sMARIO_BROS_SPRITE_XML = "Content\\Textures\\XmlFiles\\MarioBrosSprite.xml";
-	const string XmlParserHelper::sMARIO_BROS_LEVELS_XML = "Content\\Textures\\XmlFiles\\MarioBrosLevels.xml";
+	const string XmlParserHelper::sMARIO_BROS_SPRITE_XML = "Content\\XmlFiles\\MarioBrosSprite.xml";
+	const string XmlParserHelper::sMARIO_BROS_LEVELS_XML = "Content\\XmlFiles\\MarioBrosLevels.xml";
 
 	void XmlParserHelper::LoadSprites(Animator& animator) const
 	{
